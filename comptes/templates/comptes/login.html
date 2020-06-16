@@ -1,0 +1,19 @@
+{% extends "comptes/auth_base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}{{ block.super }}connexion{% endblock %}
+
+{% block form_heading %}Veuillez vous connecter{% endblock %}
+
+{% block form %}
+  {% crispy form %}
+
+  <div class="form-message">
+    <br>
+    <p>
+      Vous n'etes pas encore inscrit? <a href="{% url 'comptes:signup' %}">Inscrivez-vous</a>.
+    </p>
+  </div>
+{% endblock form %}
+

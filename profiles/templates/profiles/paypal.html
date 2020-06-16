@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load thumbnail %}
+
+{% block title %}{{ block.super }}{{user.name}}{% endblock %}
+{% block cssImplicite %}
+  <style>
+    .liste{ 
+      background-color: #d7d7d7;
+      color: black;
+    }
+  </style>
+{% endblock %}
+{% block container %}
+
+<div class="container profile-head">
+  <div class="row">
+    <div class="col-sm-10">
+      <h1>{{ show_user.get_full_name }}</h1>
+    </div>
+    <div class="col-sm-2"><img title="profile picture" class="img-circle img-responsive" src="{% thumbnail show_user.profile.picture|default:'default_profile.png' 140x140 crop %}">
+    </div>
+  </div>
+</div>
+
+<div class="container profile-body">
+  <div class="row">
+    {% include 'profiles/col4.html' %}
+    {% if Abonnement.statutCompte %}
+    <div style="margin-top:10%; text-align: center"><p style="color: tomato;font-size: 30px; font-weight: bold">Vous avez déja un abonnement en cours</p></div>
+    {% else %}
+    <div class="col-sm-8">
+      <div class="panel panel-default" >
+        <div class="panel-heading liste" style="background-color:grey; color: white" >
+          <h3 style="color: white">Abonnement</h3>
+        </div> 
+        <div class="panel-body liste"></div> 
+      </div>
+    </div>
+    <div class="col-sm-8">
+      <div class="liste" style="border:1px solid grey; max-width:780px; border-radius:8px; padding:30px 30px 30px 30px">
+          
+          <div style="height:60px; font-size:16px">
+            Pour procéder à votre abonnement mensuel de 47€ afin de pouvoir apporter et recevoir de l'aide et en bénéficier, veuillez cliquer sur le boutton ci-dessous !
+          </div>
+          <button style="margin-bottom:10px; margin-top:10px;" onclick="location.href=''" id="activ" class="btn btn-warning btn-lg">Je procède à mon abonnement</button>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+
+{% endblock %}
+
+

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load thumbnail %}
+{% load humanize %}
+{% load mes_filtres %}
+
+{% block title %}{{ block.super }}{{user.name}}{% endblock %}
+{% block cssImplicite %}
+  <style>
+    .liste{ 
+      background-color: #d7d7d7;
+      color: black;
+    }
+    .liste-couleur{ 
+      background-color: #07a4e2;
+      color: rgb(0, 0, 0);
+    }
+  </style>
+{% endblock %}
+{% block container %}
+
+<div class="container profile-head">
+  <div class="row">
+    <div class="col-sm-10">
+      <h1>{{ show_user.get_full_name }}</h1>
+    </div>
+    <div class="col-sm-2"><img title="profile picture" class="img-circle img-responsive" src="{% thumbnail show_user.profile.picture|default:'default_profile.png' 140x140 crop %}">
+    </div>
+  </div>
+</div>
+
+<div class="container profile-body">
+  <div class="row">
+    {% include 'profiles/col4.html' %}
+    {% if Abonnement.statutCompte %}
+    <div class="col-sm-8">
+      <div class="panel panel-default" >
+        <div class="panel-heading" style="background-color:grey" >
+          <h3 style="color:white">Mon tableau d'apports d'aide</h3>
+        </div> 
+        <div class="panel-body liste"></div> 
+      </div>
+    </div>
+    <div class="col-sm-8">
+    <div class="table-responsive-sm" style="height:400px;width:100%; overflow:scroll">
+    <table class="table table-bordered">
+      <thead class="liste" style="position:sticky">
+        <tr>
+          <th scope="col" style="min-width:100px;">Date de soumssion</th>
+          <th scope="col" style="min-width:150px;">Montant</th>
+          <th scope="col" style="min-width:100px;">Apporté à</th>
+          <th scope="col" style="min-width:100px;">Contact</th>
+          <th scope="col" style="min-width:150px;">Delai d'envoi</th>
+          <th scope="col" style="min-width:100px;">Reception confirmé?</th>
+          <th scope="col" style="min-width:100px;">Confirmation</th>
+        </tr>
+      </thead>
+      {% for ligne in liste_actions  %}
+      <tbody class="liste-couleur">
+        <tr>
+          <td>{{ligne.dateDeSoumission }} </td>
+          <td>{{ligne.montantApporte|intcomma}} XOF</td>
+          <td>{% nom_utilisateur_simple ligne.recepteur %} </td>
+          <td>{% contact ligne.recepteur %} </td>
+          <td><span style="font-weight:bold; font-size:16px">{{ ligne.dateLimiteEnvoi|naturaltime }}</span> </td>
+          <td>{% if ligne.etatDeReception %}Oui{% else %}Pas encore{% endif %} </td>
+          <td>{% if ligne.etatDapport %}Ok{% else %}<a href="{% url 'profiles:ConfirmeEnvoi' Id=ligne.id %}" class="btn btn-danger btn-sm">Confirmer</a>{% endif %}</td>
+        </tr>
+      </tbody >
+      {% endfor %}
+    </table>
+    </div>
+    </div>
+    {% else %}
+    <div style="margin-top:10%; text-align: center"><p style="color: tomato;font-size: 30px; font-weight: bold">Vous devez vous abonner pour consulter cette page</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+
+{% endblock %}
+
+

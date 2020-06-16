@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load thumbnail %}
+{% load humanize %}
+{% load mes_filtres %}
+
+{% block title %}{{ block.super }}{{user.name}}{% endblock %}
+{% block cssImplicite %}
+<style>
+  .boutton-cadre{ 
+    position: absolute;
+    bottom:30px;
+    left:20px;
+    width: 150px; 
+    height: 30px;
+    border:1px solid gray;
+    border-radius:4px;
+    background-color: #0082f3;
+  }
+  .bio{ 
+    margin-top:20px;
+  }
+  .panfond{ 
+      background-color: #d7d7d7;
+      color: black;
+  }
+  .liste{ 
+      background-color: #4b4b4b;
+      color: rgb(255, 255, 255);
+  }
+  .liste-couleur{ 
+    background-color: #51afee;
+    color: rgb(0, 0, 0);
+  }
+  .liste-col-actu{ 
+    background-color: #cacaca;
+    color: rgb(0, 0, 0);
+  }
+</style>
+{% endblock %}
+
+{% block container %}
+{% if Abonnement.statutCompte %}
+{% else %}
+<img src="" alt="" onerror="desactive('activ', 'activ1', 'activ2', 'activ3', 'activ4')">
+{% endif %}
+<div class="container profile-head">
+  <div class="row">
+    <div class="col-sm-10">
+      <h1>{{ show_user.get_full_name }}</h1>
+      <button style="margin-bottom:10px" onclick="location.href='{% url 'profiles:aider' %}'" id="activ" class="btn btn-success">J'apporte une aide</button>
+      {% if Abonnement.statutCompte %}
+      {% else %}
+        <button style="margin-bottom:10px" onclick="location.href='{% url 'profiles:paypal' %}'" id="abonner" class="btn btn-danger">Je m'abonne</button>
+      {% endif %}
+    </div>
+    <div class="col-sm-2"><img title="profile picture" class="img-circle img-responsive" src="{% thumbnail show_user.profile.picture|default:'default_profile.png' 140x140 crop %}">
+    </div>
+  </div>
+  <div class="bio"><strong>Bio</strong>: {{ show_user.profile.bio }}</div>
+</div>
+
+<div class="container profile-body">
+  <div class="row">
+    {% include 'profiles/col4.html' %}
+      {% for item in recent %}
+      <div class="col-sm-4">
+        <div style="background-color: #0082f3;margin-bottom: 10px;border:1px solid rgb(156, 156, 156); max-width:780px; border-radius:8px; padding:5px 5px 5px 5px">
+            <div style="text-align: center"><span style="color: white">{{ item.montantApporte }} XOF émis {{ item.dateDeSoumission|naturaltime }} en attente de fusion</span> </li>
+            </div>
+        </div>
+      </div>
+      {% endfor %}
+      <div class="col-sm-8"></div>
+      {% if editable %}
+      <div class="col-sm-4">
+        <div class="panel">
+          <div class="panel-heading" style="background-color: grey; color:white">VOUS DEVEZ APPORTER</div>
+          <div class="panel-body panfond" style="height:130px">
+            <ul>
+              {% for ok in Apaye %}
+                <li >{{ ok.montantApporte|intcomma }} XOF à {% noms_nom ok.recepteur %} </li>
+              {% endfor %}
+            </ul>
+            <button id="activ1" class="boutton-cadre" onclick="location.href='{% url 'profiles:ListeEnvoi' %}'"><span style="color:white">Voir tout</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4" >
+        <div class="panel">
+          <div class="panel-heading" style="background-color: grey; color:white">VOUS AVEZ PAYE</div>
+          <div class="panel-body panfond" style="height:130px">
+            <ul>
+              {% for ok in paye %}
+                <li >{{ ok.montantApporte|intcomma }} XOF à {% noms_nom ok.recepteur %} </li>
+              {% endfor %}
+            </ul>
+            <button id="activ2" class="boutton-cadre" onclick="location.href='{% url 'profiles:HEnvoye' %}';"><span style="color:white">Voir tout</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4" >
+        <div class="panel">
+          <div class="panel-heading" style="background-color: grey; color:white">VOUS DEVEZ RECEVOIR </div>
+          <div class="panel-body panfond" style="height:130px">
+            <ul>
+              {% for ok in Arecevoir %}
+                <li >{{ ok.montantApporte|intcomma }} XOF de {% noms_nom ok.emetteur %} </li>
+              {% endfor %}
+            </ul>
+            <button id="activ3" class="boutton-cadre" onclick="location.href='{% url 'profiles:ListeReception' %}';"><span style="color:white">Voir tout</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4" >
+        <div class="panel">
+          <div class="panel-heading" style="background-color: grey; color:white">VOUS AVEZ RECU</div>
+          <div class="panel-body panfond" style="height:130px">
+            <ul>
+              {% for ok in recu %}
+                <li >{{ ok.montantApporte|intcomma }} XOF de {% noms_nom ok.emetteur %} </li>
+              {% endfor %}
+            </ul>
+            <button id="activ4" class="boutton-cadre" onclick="location.href='{% url 'profiles:MRecu' %}';" ><span style="color:white">Voir tout</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    <div class="table-responsive-sm" style="height:400px;width:100%; overflow:scroll">
+      <table class="table table-bordered">
+        <thead class="liste" style="position:sticky; color: white; background-color: rgb(104, 103, 103)">
+          <tr>
+            <th scope="col" style="min-width:100px;">Date de soumssion</th>
+            <th scope="col" style="min-width:150px;">Montant</th>
+            <th scope="col" style="min-width:100px;">Apporté par</th>
+            <th scope="col" style="min-width:100px;">Bénéficiaire</th>
+            <th scope="col" style="min-width:150px;">Aide apportée?</th>
+            <th scope="col" style="min-width:100px;">Reception confirmé?</th>
+            <th scope="col" style="min-width:100px;">Décision finale</th>
+          </tr>
+        </thead>
+        {% if Abonnement.statutCompte %}
+          {% for ligne in Histo  %}
+          <tbody class="{% if ligne.recepteur == show_user.profile %}liste-col-actu{% else %}liste-couleur{% endif %}" >
+            <tr>
+              <td>{{ligne.dateDeSoumission }} </td>
+              <td>{{ligne.montantApporte|intcomma}} XOF</td>
+              <td>{% noms_nom ligne.emetteur %} ({% contact ligne.emetteur %})</td>
+              <td>{% noms_nom ligne.recepteur %} ({% contact ligne.recepteur %})</td>
+              <td>{% if ligne.etatDapport %}Oui{% else %}Non{% endif %} </td>
+              <td>{% if ligne.etatDeReception %}Oui{% else %}Non{% endif %} </td>
+              <td>{% if ligne.etatDapport and ligne.etatDeReception %}validé{% else %}Non validé{% endif %}</td>
+            </tr>
+          </tbody >
+          {% endfor %}
+        {% endif %}
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+

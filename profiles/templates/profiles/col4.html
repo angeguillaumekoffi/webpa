@@ -1,0 +1,38 @@
+
+  {% load humanize %}
+  {% block cssImplicite %}
+  <style>
+    .liste{ 
+      background-color: #d7d7d7;
+      color: black;
+    }
+  </style>
+  {% endblock %}
+  <div class="col-sm-4">
+    <ul class="list-group">
+      <li class="list-group-item text-muted" style="background-color: grey; color:white">Informations</li>
+      {% if show_user.is_active %}
+        <li class="list-group-item text-right liste"><span class="pull-left"><strong>Compte </strong></span> <span style="color:green">actif</span></li>
+      {% else %}
+        <li class="list-group-item text-right liste"><span class="pull-left"><strong>Compte </strong></span><span style="color:red">bloqué</span></li>
+      {% endif %}
+      <li class="list-group-item text-right liste"><span class="pull-left"><strong>Pays :</strong></span> {{ show_user.profile.pays}}</li>
+      <li class="list-group-item text-right liste"><span class="pull-left"><strong>Email:</strong></span> {{ show_user.email|default:"missing" }}
+        {% if show_user.profile.email_verified %}
+          <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" title="This email address has been verified"></span>
+          <span class="sr-only">Verifié</span>
+        {% else %}
+          <span class="glyphicon glyphicon-warning-sign" aria-hidden="true" title="This email address is not verified"></span>
+          <span class="sr-only">Non Verifié</span>
+        {% endif %}
+      </li>
+      <li class="list-group-item text-right liste"><span class="pull-left"><strong>Contact :</strong></span> {{ show_user.profile.contact}}</li>
+      <li class="list-group-item text-right liste"><span class="pull-left"><strong>Abonnement mensuel:</strong></span>{% if Abonnement.statutCompte %}<span style="color:green">En cours...</span>{% else %}<span style="color:red">Veuillez vous abonner</span> {% endif %} </li>
+      <li class="list-group-item text-right liste"><span class="pull-left"><strong>Expire :</strong></span>_{{ Abonnement.dateDexpiration|naturaltime }}</li>
+      <li class="list-group-item text-right liste"><span class="pull-left"><strong>Inscrit le</strong></span> {{ show_user.date_joined }}</li>
+      <li class="list-group-item text-right liste"><span class="pull-left"><strong>en ligne </strong></span> {{ show_user.last_login|naturaltime }}</li>
+      <li class="list-group-item text-right liste" style="max-height:300px; min-height:100px;"><span class="pull-left"><strong></strong></span></li>
+    </ul>
+  </div>
+
+

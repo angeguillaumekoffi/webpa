@@ -1,0 +1,21 @@
+{% extends "comptes/auth_base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}{{ block.super }}{{user.name}}{% endblock %}
+
+{% block form_heading %}Veuillez vous connecter{% endblock %}
+
+{% block form %}
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        {% crispy user_form %}
+	    {% crispy profile_form %}
+    </form>
+
+  <div class="form-message">
+    <p>
+      Vous devez remplir ces champs pour valider votre inscription</a>.
+    </p>
+  </div>
+{% endblock form %}

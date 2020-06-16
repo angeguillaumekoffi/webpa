@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load thumbnail %}
+{% load humanize %}
+{% load mes_filtres %}
+
+{% block title %}{{ block.super }}{{user.name}}{% endblock %}
+{% block cssImplicite %}
+  <style>
+    .liste{ 
+      background-color: #d7d7d7;
+      color: black;
+    }
+    .liste-couleur{ 
+      background-color: #0082f3;
+      color: rgb(255, 255, 255);
+    }
+  </style>
+{% endblock %}
+{% block container %}
+
+<div class="container profile-head">
+  <div class="row">
+    <div class="col-sm-10">
+      <h1>{{ show_user.get_full_name }}</h1>
+      {% if editable %}
+      <a href="{% url 'profiles:edit_self' %}" class="btn btn-info">Modifier Profile</a>
+      {% endif %}
+    </div>
+    <div class="col-sm-2"><img title="photo de profil" class="img-circle img-responsive" src="{% thumbnail show_user.profile.picture|default:'default_profile.png' 140x140 crop %}">
+    </div>
+  </div>
+</div>
+
+<div class="container profile-body">
+  <div class="row">
+    {% include 'profiles/col4.html' %}
+    {% if Abonnement.statutCompte %}
+    <div class="col-sm-8">
+      <div class="panel panel-default" >
+        <div class="panel-heading" style="background-color: grey" >
+          <h3 style="color:white">Mon tableau de reception d'aide</h3>
+        </div>
+        <div class="panel-body liste"></div>
+      </div>
+    </div>
+    <div class="col-sm-8">
+    <div class="table-responsive-sm" style="height:400px;width:100%; overflow:scroll">
+    <table class="table table-bordered">
+      <thead class="liste">
+        <tr>
+          <th scope="col" style="min-width:100px;">Date d'envoi</th>
+          <th scope="col" style="min-width:100px;">Envoyé par</th>
+          <th scope="col" style="min-width:100px;">Contact</th>
+          <th scope="col" style="min-width:100px;">Montant</th>
+          <th scope="col" style="min-width:50px;">Effectué?</th>
+          <th scope="col" style="min-width:50px;">Delai de confirmation</th>
+          <th scope="col" style="min-width:100px;">Confirmation</th>
+        </tr>
+      </thead>
+      {% for ligne in liste_actions  %}
+      <tbody class="liste-couleur">
+        <tr>
+          <td>{{ligne.dateDeValidation }} </td>
+          <td>{% nom_utilisateur_simple ligne.emetteur %} </td>
+          <td>{% contact ligne.emetteur %} </td>
+          <td>{{ligne.montantApporte|intcomma}} XOF</td>
+          <td>{% if ligne.etatDapport %}Oui{% else %}Pas encore{% endif %} </td>
+          <td><span style="font-weight:bold; font-size:16px">{{ligne.dateLimiteReception|naturaltime}}</span></td>
+          <td>{% if ligne.etatDapport and ligne.etatDeReception %}Ok
+            {% elif not ligne.etatDapport %} En attente
+            {% else %}
+            <form name="{{ ligne.id }}" action="{% url 'profiles:ConfirmeReception' Id=ligne.id %}" method="post">
+              {% csrf_token %}{% crispy Besoin_form %}{% crispy Recu_form %}
+              <input type="button" class="btn btn-danger btn-sm" value="Confirmer" onclick='ConfirmerSpec("Confirmez vous avoir reçu cette somme ?",this.form)'>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+      </tbody >
+      {% endfor %}
+    </table>
+    </div>
+    </div>
+    {% else %}
+    <div style="margin-top:10%; text-align: center"><p style="color: tomato;font-size: 30px; font-weight: bold">Vous devez vous abonner pour consulter cette page</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+
+{% endblock %}
+
+

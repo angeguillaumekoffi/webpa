@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+{% block styles %}
+  <style>
+  .cadrea {
+    max-width:500px;
+    padding:10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  .cadreb {
+    max-width:490px;
+    padding:20px;
+    margin-left:10px;
+    margin-right:10px;
+    border:1px solid gray;
+    border-radius:8px;
+    background-color:#ffffff;
+  }
+  </style>
+{% endblock %}
+
+{% block stylebody %}
+  background-color:#0082f3;
+{% endblock %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block container %}
+<div class="container form-box cadrea">
+  <div class="cadreb">
+    <div class="text-center">
+      <h2>{% block form_heading %}{% endblock %}</h2>
+    </div>
+    {% block form %}
+    {% endblock %}
+  </div>
+</div>
+
+{% endblock container %}
+

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load thumbnail %}
+{% load humanize %}
+{% load mes_filtres %}
+
+{% block title %}{{ block.super }}{{user.name}}{% endblock %}
+{% block cssImplicite %}
+  <style>
+    .liste{ 
+      background-color: #d7d7d7;
+      color: black;
+    }
+  </style>
+{% endblock %}
+{% block container %}
+
+<div class="container profile-head">
+  <div class="row">
+    <div class="col-sm-10">
+      <h1>{{ show_user.get_full_name }}</h1>
+    </div>
+    <div class="col-sm-2"><img title="profile picture" class="img-circle img-responsive" src="{% thumbnail show_user.profile.picture|default:'default_profile.png' 140x140 crop %}">
+    </div>
+  </div>
+</div>
+
+<div class="container profile-body">
+  <div class="row">
+    {% include 'profiles/col4.html' %}
+    {% if Abonnement.statutCompte %}
+    <div class="col-sm-8">
+      <div class="panel panel-default" >
+        <div class="panel-heading " style="background-color:grey" >
+          <h3 style="color:white">Confirmation de transfert effectué</h3>
+        </div>
+        <div class="panel-body liste"></div> 
+      </div>
+    </div>
+    <div class="col-sm-8">
+      <div class="liste" style="border:1px solid grey; max-width:780px; border-radius:8px; padding:10px 30px 30px 30px;">
+        <div style="height:60px">NB. : Si vous avez effectué le transfert d'argent au concerné, veuillez joindre
+          une image (capture d'écran) de la facture ou du reçu afin de justifier la transaction.
+          </div>
+        <div class="btn-group-sm">
+        {% for lst in liste_actions %}
+          <input type="text" class="input-group" style="min-width:50%; margin-top:15px;" readonly value="Montant :  {{ lst.montantApporte|intcomma }} XOF"></input>
+          <input type="text" class="input-group" style="min-width:50%; margin-top:20px;" readonly value="Date de soumission :  {{ lst.dateDeSoumission.date }}"></input>
+          <input type="text" class="input-group" style="min-width:50%; margin-top:20px; margin-bottom:20px" readonly value="Recepteur :  {% nom_utilisateur_simple lst.recepteur %}"></input>
+
+        {% endfor %}
+        </div>
+        <form name="formulaire" enctype="multipart/form-data" method="post">
+          {% csrf_token %}
+          {% crispy Envoi_form %}
+        </form>
+      </div>
+    </div>
+    {% else %}
+    <div style="margin-top:10%; text-align: center"><p style="color: tomato;font-size: 30px; font-weight: bold">Vous devez vous abonner pour consulter cette page</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+
+{% endblock %}
+
+

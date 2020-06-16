@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load thumbnail %}
+{% load humanize %}
+{% load mes_filtres %}
+
+{% block title %}{{ block.super }}{{user.name}}{% endblock %}
+{% block cssImplicite %}
+  <style>
+    .liste{ 
+      background-color: #d7d7d7;
+      color: black;
+    }
+    .liste-couleur{ 
+      background-color: #07a4e2;
+      color: rgb(0, 0, 0);
+    }
+  </style>
+{% endblock %}
+{% block container %}
+
+<div class="container profile-head">
+  <div class="row">
+    <div class="col-sm-10">
+      <h1>{{ show_user.get_full_name }}</h1>
+      {% if editable %}
+      <a href="{% url 'profiles:edit_self' %}" class="btn btn-info">Modifier Profile</a>
+      {% endif %}
+    </div>
+    <div class="col-sm-2"><img title="profile picture" class="img-circle img-responsive" src="{% thumbnail show_user.profile.picture|default:'default_profile.png' 140x140 crop %}">
+    </div>
+  </div>
+</div>
+
+<div class="container profile-body">
+  <div class="row">
+    {% include 'profiles/col4.html' %}
+    {% if Abonnement.statutCompte %}
+    <div class="col-sm-8">
+      <div class="panel panel-default" >
+        <div class="panel-heading" style="background-color:grey" >
+          <h3 style="color:white">Historique des montants reçus</h3>
+        </div>
+        <div class="panel-body liste"></div>
+      </div>
+    </div>
+    <div class="col-sm-8">
+    <div class="table-responsive-sm" style="height:400px;width:100%; overflow:scroll">
+    <table class="table table-bordered">
+      <thead class="liste">
+        <tr>
+          <th scope="col" style="min-width:100px;">Date d'envoi</th>
+          <th scope="col" style="min-width:100px;">Envoyé par</th>
+          <th scope="col" style="min-width:100px;">Contact</th>
+          <th scope="col" style="min-width:100px;">Montant</th>
+          <th scope="col" style="min-width:50px;">Effectué?</th>
+          <th scope="col" style="min-width:50px;">J'ai reçu</th>
+          <th scope="col" style="min-width:100px;">Confirmation</th>
+        </tr>
+      </thead>
+      {% for ligne in liste_actions  %}
+      <tbody class="liste-couleur">
+        <tr>
+          <td>{{ligne.dateDeValidation }} </td>
+          <td>{% nom_utilisateur_simple ligne.emetteur %} </td>
+          <td>{% contact ligne.emetteur %} </td>
+          <td>{{ligne.montantApporte|intcomma}} XOF</td>
+          <td>Oui</td>
+          <td>Oui</td>
+          <td>Ok</td>
+        </tr>
+      </tbody >
+      {% endfor %}
+    </table>
+    </div>
+    </div>
+    {% else %}
+    <div style="margin-top:10%; text-align: center"><p style="color: tomato;font-size: 30px; font-weight: bold">Vous devez vous abonner pour consulter cette page</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+
+{% endblock %}
+
+
